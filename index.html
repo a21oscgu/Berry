@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Berry</title>
+    <meta charset="utf-8">
+    <!--
+    ========================
+        Table of contents
+    ========================
+        1. Scripts
+            1.1 Javascript
+                1.1.1 SPA
+                1.1.2 Burger icon shift styling
+                1.1.3 Hammer.js - Swipe - Carousel
+                1.1.4 Hammer.js - Doubletap - Tree SVG
+                1.1.5 Shaker.js - State
+                1.1.6 Shaker.js - Shake
+        2. Links
+        3. Global styles
+        4. Header
+        5. Footer
+        6. SVG - Burger icon
+            6.1 Cross
+            6.2 Faded
+        7. Page 1
+            7.1 Carousel
+                7.1.1 Media Queries
+            7.2 Hero image text
+            7.3 Section 2
+                7.3.1 Keyframes & images
+                7.3.2 Media Queries
+            7.4 Section 3
+                7.4.1 Media Queries
+        8. Page 2
+            8.1 Menu
+                8.1.1 Media Queries
+        9. Page 5
+        10. Page 6
+        11. Crossout
+    ============================================
+-->
+    <!-- 1. Scripts  -->
+    <!-- Hammer.js -->
+    <script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
+    <!-- Shaker.js -->
+    <script src="https://raw.githack.com/HGustavs/Shaker.js/master/shaker.js"></script>
+
+    <!-- 2. Links  -->
+    <!-- Favicon  -->
+    <link rel="icon" type="image/png" href="images/berry.png">
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Font: Jost (almost like Futura)  -->
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
+    <!-- Font: Bodoni Moda  -->
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda&display=swap" rel="stylesheet">
+    <style>
+        /*======================
+            3. Global styles
+        ======================*/
+        :root{
+            /* Colors */
+            --dark: #1b1b1b;
+            --light: white;
+            --disabled: #0006;
+            --transparent: #0000;
+            /*Selected button, doesn't have a purpose yet, see JS*/
+            --selectedClicker: rgba(255, 255, 255, 0.95);
+            /*Unselected button (opacity should normally be on 0.75)*/
+            --light95: rgba(255, 255, 255, 0.95);
+            --red: red;
+
+            /* Linear-gradients */
+            --lgDark: linear-gradient(180deg, #1b1b1b 0%, #181818 100%);
+            --lgLight:linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 100%);;
+
+            /* Root font-size */
+            font-size: 16px
+        }
+
+        /* Help */
+        body{
+            margin: 0;
+            overflow-x: hidden;
+            background: var(--lgLight);
+            font-family: "Jost";
+        }
+        button{
+            border-width: 0.3vw;
+        }
+        html {
+            overflow-y: scroll;
+        }
+
+        /* Scroll */
+        /*Width*/
+        ::-webkit-scrollbar {
+            width: 0.5vw;
+        }
+        /*Track*/
+        ::-webkit-scrollbar-track {
+            background-image:linear-gradient(rgb(114, 114, 114), rgb(104, 104, 104));
+            box-shadow: inset 0 0 0.3vw #312526;
+        }
+        /*Handle*/
+        ::-webkit-scrollbar-thumb {
+            background: rgb(32, 32, 32);
+            box-shadow: inset 0 0 0.1vw #312526;
+            border-radius: 2rem;
+        }
+        /*Handle on hover*/
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgb(14, 14, 14);
+            box-shadow: inset 0 0 0.1vw #312526;
+        }
+
+        *::before,::after{
+            box-sizing: border-box;
+        }
+
+        /*======================
+            4. Header
+        ======================*/
+        .navbar{
+            display: grid;
+            grid-template-columns: 252.31px 1fr 100px;
+            grid-template-rows: 100px;
+            position: relative;
+            background-color: var(--light);
+            box-shadow: 5px 5px 10px 2.5px rgba(0, 0, 0, 0.1);
+            z-index: 4;
+        }
+        #nav__box__logo{
+            grid-column: 1;
+            margin: 0;
+            min-width: 252.31px;
+            display: grid;
+            align-items: center;
+            background-color: var(--light);
+        }
+        #nav__logo{
+            margin: 0;
+            min-width: 252.31px;
+            font-size: 4em;
+            text-align: center;
+            font-family: "Bodoni";
+            font-weight: 400;
+            background-color: var(--light);
+        }
+        #nav__burger{
+            padding: 0;
+            grid-column: 3;
+            position: relative;
+            background-color: var(--transparent);
+            border-width: 0;
+            /*Help*/
+            /*border: 3px solid red;*/
+        }
+
+        /*======================
+            5. Footer
+        ======================*/
+        .footerContainer{
+            display: grid;
+            grid-template-columns: 1fr 72px 0.7fr 1fr;
+            grid-template-rows: 0.5fr auto 0.5fr 0.5fr 0.1fr;
+            row-gap: 5em;
+            background: var(--lgDark);
+        }
+        footer ul{
+            list-style-type: none;
+        }
+        .list1{
+            grid-column: 2/5;
+            grid-row: 2;
+            padding-left: 0;
+        }
+        .footerListItem{
+            position: relative;
+            margin-bottom: 1em;
+            font-size: 2.5em;
+            color: var(--light);
+        }
+        .footerListItem::after{
+            position: absolute;
+            content:"";
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 0.1em;
+            background: var(--lgLight);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 250ms ease-in;
+        }
+        .footerListItem:hover::after{
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        .list2{
+            grid-column: 2;
+            grid-row: 3;
+            margin: 0;
+            padding: 0;
+        }
+        .socialGrid{
+            display: grid;
+            grid-template-columns: 72px 72px;
+        }
+        .socialButton{
+            color: var(--light);
+        }
+        .fb{
+            grid-column: 1;
+        }
+        .ig{
+            grid-column: 2;
+        }
+        #footerMargin{
+            grid-row: 4;
+            grid-column: 1/4;
+        }
+        .footer__btn{
+            border-width: 0;
+            background-color: var(--transparent);
+            font-family: "Jost";
+        }
+        
+        /*========================
+            6. SVG - Burger icon
+        ========================*/
+        .burger--visible{
+            fill: var(--dark);
+        }
+        .burger--invisible{
+            fill: var(--transparent);
+        }
+        #burger__upper{
+            transform: translate(45px,30px);
+        }
+        #burger__middle{
+            transform: translate(45px,50px);
+        }
+        #burger__lower{
+            transform: translate(45px,70px);
+        }
+
+        /*------------------------
+            6.1 Cross
+        ------------------------*/
+        /*#burger__X1{
+            transform: translate(50px,50px) rotate(135deg);
+        }
+        #burger__X2{
+            transform: translate(50px,50px) rotate(45deg);
+        }
+        #X__borderRadius1{
+            transform: translate(43px,0px);
+        }
+        #X__borderRadius2{
+            transform: translate(-41px,0px);
+        }*/
+
+        /*------------------------
+            6.2 Faded
+        ------------------------*/
+        .burger--faded--visible{
+            fill: var(--disabled);
+        }
+        #burger__upper--faded{
+            transform: translate(45px,30px);
+        }
+        #burger__middle--faded{
+            transform: translate(45px,50px);
+        }
+        #burger__lower--faded{
+            transform: translate(45px,70px);
+        }
+
+        /*======================
+            7. Page 1
+        ======================*/
+
+        /*------------------------
+            7.1 Carousel
+        ------------------------*/
+        #swipeContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+            box-shadow: 5px 5px 10px 2.5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            touch-action: pan-y;
+            user-select: none;
+            box-sizing: border-box;
+        }
+        #innerContainer{
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: 10% 27% 48% 15%;
+            overflow: hidden;
+        }
+        #pageClicker{
+            grid-column: 1/4;
+            grid-row: 4;
+            width: auto;
+            height: auto;
+            display: grid;
+            grid-template-columns: 1fr 10% 1fr 10% 1fr;
+            z-index: 3;
+        }
+        .clicker{
+            justify-self: center;
+            min-width: 8rem;
+            height: 1rem;
+            border-radius: 0.3rem;
+            box-shadow: 0.05rem 0.05rem 0.2rem #0005;
+            box-shadow: 10px 10px 10px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 2em;
+            background: var(--light95);
+            z-index: 3;
+        }
+        #leftClicker{
+            grid-column: 2;
+        }
+        #rightClicker{
+            grid-column: 4;
+        }
+        /*------------------------
+            7.1.1 Media Queries
+        ------------------------*/
+        @media screen and (min-width:60rem) {
+            #leftClicker{
+                min-width: 12rem;
+                height: 2rem;
+                border-radius: 0.9rem;
+            }
+            #rightClicker{
+                min-width: 12rem;
+                height: 2rem;
+                border-radius: 0.9rem;
+            }
+        }
+        /*Does not work. See Javascript below
+        .activeClicker{
+            background: var(--selectedClicker);
+        }*/
+        #swipePage1 {
+            left: 0%;
+        }
+        .swipePage{
+            position: relative;
+            grid-column: 1/4;
+            grid-row: 1/5;
+            left: 100%;
+            z-index: 2;
+        }
+        .swipePage__img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        @keyframes inleft {0% { left: -100%; } 100% { left: 0%;} }
+        @keyframes inright {0% { left: 100%; } 100% { left: 0%;} }
+        @keyframes outleft {0% { left: 0%; } 100% { left: -100%;} }
+        @keyframes outright {0% { left: 0%; } 100% { left: 100%;} }
+
+        /*------------------------
+            7.2 Hero image text
+        ------------------------*/
+        .page1__box{
+            position: absolute;
+            top: 3em;
+            left: 13em;
+            right: 13em;
+            justify-self: stretch;
+            display: grid;
+            place-items: center;
+            background: var(--lgLight);
+            box-shadow: 10px 10px 10px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 2em;
+            z-index: 3;
+        }
+        .box__header{
+            margin: 1vw;
+            text-align: center;
+            font-size: 6vw;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        /*------------------------
+            7.3 Section 2
+        ------------------------*/
+        #section2Container{
+            position: static;
+            height: auto;
+            display: grid;
+            align-items: center;
+            grid-template-columns: 1fr 0.3fr 0.2fr 0.2fr 0.3fr 1fr;
+            grid-template-rows: minmax(0, 0.2fr) 1fr 5em 1fr 5em 1fr 5em;
+            row-gap: 4em;
+            margin-bottom: 3em;
+        }
+        .s2c__section{
+            grid-column: 3/5;
+            margin-top: auto;
+            margin-bottom: auto;
+            justify-self: start;
+            align-self: end;
+            text-align: center;
+        }
+        #s2c__find{
+            grid-row: 3;
+        }
+        #s2c__order{
+            grid-row: 5;
+        }
+        #s2c__enjoy{
+            grid-row: 7;
+        }
+        .s2c__circle{
+            transform: translate(50px,50px);
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+        .s2c__nrbox{
+            grid-column: 2;
+            display: grid;
+            justify-items: center;
+            align-items: center;
+        }
+        #s2c__nrbox1{
+            grid-row: 3;
+        }
+        #s2c__nrbox2{
+            grid-row: 5;
+        }
+        #s2c__nrbox3{
+            grid-row: 7;
+        }
+        .nrBox__nr{
+            grid-column: 1;
+            grid-row: 2;
+            margin: 0;
+            color: var(--light);
+            z-index: 1;
+        }
+        .box__svg{
+            grid-column: 1;
+            grid-row: 2;
+            max-width: 7vw;
+        }
+        .s2c__box{
+            grid-column: 2/6;
+            display: grid;
+            justify-items: center;
+            z-index: 1;
+        }
+        #s2c__box1{
+            grid-row: 2;
+        }
+        #s2c__box3{
+            grid-row: 6;
+        }
+        #smiley{
+            grid-column: 1;
+            grid-row: 1;
+        }
+        #smileyImg{
+            grid-column: 1;
+            grid-row: 1;
+            z-index: 1;
+        }
+        #smileyFace{
+            transform: translate(50px,50px);
+
+        }
+        .redSmiley{
+            fill: var(--red);
+        }
+        .transparentSmiley{
+            fill: var(--transparent);
+        }
+        .s2c__img{
+            grid-row: 2;
+            max-width: 100%;
+        }
+        .s2c__smallCard{
+            grid-column: 2/6;
+            background: var(--lgLight);
+            padding: 3em;
+            box-shadow: 10px 10px 10px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 1em;
+        }
+        #s2c__smallCard1{
+            grid-row: 3;
+        }
+        #s2c__smallCard2{
+            grid-row: 5;
+        }
+        #s2c__smallCard3{
+            grid-row: 7;
+        }
+        #appleCount{
+            grid-column: 5;
+            grid-row: 3;
+            justify-self: center;
+            font-family: "Jost";
+            font-size: 2em;
+            color: var(--dark);
+        }
+
+        /*---------------------------
+            7.3.1 Keyframes & images
+        ---------------------------*/
+        #apple{
+            position: absolute;
+            width: 2vw;
+            transform: translate(55px,86px);
+        }
+        .appleAnimation{
+            animation-name: appleDrop;
+            animation-duration: 0.5s;
+            animation-timing-function: linear;
+        }
+        @keyframes appleDrop{
+            0% {transform: translate(55px,86px);}
+            100% {transform: translate(50px,250px);}
+        }
+        @media screen and (min-width: 1000px) {
+            #apple{
+                transform: translate(50px,106px);
+            }
+            @keyframes appleDrop{
+                0% {transform: translate(50px,106px);}
+                100% {transform: translate(50px,400px);}
+            }    
+        }
+
+        .truck{
+            z-index: 1;
+        }
+        #keyframe__drivingTruck{
+            position: relative;
+            left: 0;
+            top: 0;
+            grid-row: 4;
+            animation-name: drivingRight;
+            animation-duration: 3s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+        }
+        .keyframe__throwBox{
+            position: relative;
+            left: -3em;
+            top: 0;
+            z-index: 0;
+            animation-name: throwing;
+            animation-duration: 3s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            width: 50%;
+            height: 50%;
+        }
+        @keyframes drivingRight{
+            0% {left:0em;}
+            25% {left:0em;}
+            35% {left:2vw;}
+            40% {left:8vw;}
+            45% {left:16vw;}
+            50% {left:32vw;}
+            55% {left:64vw;}
+            65% {left:128vw;}
+            70% {left:256vw;}
+            100% {left:256vw;}
+        }
+        @keyframes drivingNoStop{
+            0% {left:-256em;}
+            100% {left:256vw;}
+        }
+        @keyframes throwing{
+            0% {transform: rotate(0deg);}
+            15% {left:14vw;}
+            100% {left:14vw;transform: rotate(360deg);}
+        }
+        .img--darkmode{
+            width: 0;
+            height: 0;
+        }
+
+        /*---------------------------
+            7.3.2 Media Queries
+        ---------------------------*/
+        @media screen and (min-width:60em) {
+            .s2c__section{
+                font-size: 2em;
+            }
+            .nrBox__nr{
+                font-size: 2em;
+            }
+        }
+
+        /*---------------------------
+            7.4 Section 3
+        ---------------------------*/
+        #section3Container{
+            position: static;
+            height: 90vh;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            row-gap: 8em;
+        }
+        #s2c__smallCard4{
+            grid-column: 2/3;
+            grid-row: 2;
+            display: grid;
+            height: 10vh;
+        }
+        #s2c__background{
+            grid-column: 1/4;
+            grid-row: 1/4;
+            background: var(--lgLight);
+        }
+
+        /*---------------------------
+            7.4.1 Media Queries
+        ---------------------------*/
+        @media screen and (max-width:60em) {
+            #s2c__smallCard4{
+                padding: 0em;
+            }
+        }
+
+        /*======================
+            8. Page 2
+        ======================*/
+        
+        /*-----------------
+            8.1 Menu
+        -----------------*/
+        .menu{
+            position: static;
+            width: 100%;
+            height: 90vh;
+            display: grid;
+            grid-template-rows: 0.3fr 1fr 1fr 1fr 1fr 0.3fr;
+            justify-items: center;
+            align-items: center;
+        }
+        .menu__btn{
+            position: relative;
+            display: grid;
+            column-gap: 6em;
+            grid-template-columns: 1fr 1fr;
+            padding: 1em;
+            width: 30em;
+            box-shadow: 10px 10px 10px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 1em;
+            border-width: 0;
+            background: var(--lgLight);
+            font-family: "Jost";
+            font-size: 2em;
+        }
+        #menu__btn1 {
+            grid-row: 2;
+        }
+        #menu__btn2 {
+            grid-row: 3;
+        }
+        #menu__btn3 {
+            grid-row: 4;
+        }
+        #menu__btn4 {
+            grid-row: 5;
+        }
+        .arrow{
+            grid-column: 2;
+            justify-self: end;
+        }
+        .btn__text{
+            position: relative;
+            grid-column: 1;
+            justify-self: start;
+        }
+        .btn__text::after{
+            position: absolute;
+            content:"";
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 0.1em;
+            background: var(--lgDark);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 250ms ease-in;
+        }
+        .btn__text:hover::after{
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /*-----------------
+        8.1.1 Media Queries
+        -----------------*/
+        @media screen and (max-width:60em) {
+            .menu__btn{
+                width: 20em;
+                column-gap: 0;
+            }
+        }
+
+        /*======================
+            9. Page 5
+        ======================*/
+        #page5__table{
+            position: absolute;
+
+            display: grid;
+            grid-template-rows: repeat(3, 1fr);
+            grid-gap: 3em;
+            padding: 3em;
+            font-size: 2em;
+        }
+        #page5__table__td1{
+            grid-row: 1;
+        }
+        #page5__table__td2{
+            grid-row: 2;
+        }
+        #page5__table__td3{
+            grid-row: 3;
+        }
+
+        /*======================
+            10. Page 6
+        ======================*/
+        #page6__grid{
+            position: static;
+            width: 100%;
+            height: 90vh;
+            display: grid;
+            grid-template-rows: 0.7fr 0.3fr 1fr;
+            justify-items: center;
+            align-items: center;
+            font-size: 2em;
+        }
+        #page6__item{
+            grid-column: 1;
+            grid-row: 2;
+            padding: 2em;
+            box-shadow: 10px 10px 10px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 1em;
+        }
+        
+        /*======================
+            11. Crossout
+        ======================*/
+    </style>
+</head>
+<body onload="showPage(0); initHammer(); initShaker(); shake();">
+    <!-- Page0 is needed for prototype init. DON'T REMOVE! -->
+    <div id="page0" class="page">
+        <div style='position:fixed;top:0;left:0;right:0;bottom:0;display:flex;justify-content:center;align-items:center;background-color: rgba(50,50,50,0.5);z-index: 1000;'>
+            <button class="btn" type="button" onclick="initPrototype();showPage(1);">Start prototype</button>
+        </div>
+    </div>
+    <!-- Page0 is needed for prototype init. DON'T REMOVE! -->
+    <!-- 4. Header -->
+    <nav class="navbar">
+        <div id="nav__box__logo">
+            <p id="nav__logo" onclick="showPage(1); BMflipE();">BERRY</p>
+        </div>
+        <button id="nav__burger" class="btn" type="button" onclick="showPage(2); BMflipX();">
+            <!-- 6. SVG - Burger icon -->
+            <svg viewbox="0 0 100 100">
+                <rect id="burger__upper" class="burger--visible" x="-35" y="-5" width="70" height="10" rx="5" ry="5"></rect>
+                <rect id="burger__middle" class="burger--visible" x="-35" y="-5" width="70" height="10" rx="5" ry="5"></rect>
+                <rect id="burger__lower" class="burger--visible" x="-35" y="-5" width="70" height="10" rx="5" ry="5"></rect>
+                <!-- 6.1 Cross -->
+                <!--
+                <g id="burger__X1" class="MISSING">
+                    <rect x="-5" y="-42.5" width="10" height="85"></rect>
+                    <circle class="X__borderRadius1" cx="0" cy="0" r="5"></circle>
+                    <circle class="X__borderRadius2" cx="0" cy="0" r="5"></circle>
+                </g>
+                <g id="burger__X2" class="MISSING">
+                    <rect x="-5" y="-42.5" width="10" height="85"></rect>
+                    <circle class="X__borderRadius1" cx="0" cy="0" r="5"></circle>
+                    <circle class="X__borderRadius2" cx="0" cy="0" r="5"></circle>
+                </g>-->
+                
+                <!-- 6.2 Faded -->
+                <g>
+                    <rect id="burger__upper--faded" class="burger--invisible" x="-35" y="-5" width="70" height="10" rx="5" ry="5"></rect>
+                    <rect id="burger__middle--faded" class="burger--invisible" x="-35" y="-5" width="70" height="10" rx="5" ry="5"></rect>
+                    <rect id="burger__lower--faded" class="burger--invisible" x="-35" y="-5" width="70" height="10" rx="5" ry="5"></rect>
+                </g>
+            </svg>
+        </button>
+    </nav>
+    <!-- 7. Page 1 -->
+    <div id="page1" class="page">
+        <!-- 7.1 Carousel -->
+        <div id="swipeContainer">
+            <div id="innerContainer">
+                <div id="pageClicker">
+                    <div id="leftClicker" class="clicker activeClicker" onclick="swipe(-1)"></div>
+                    <div id="rightClicker" class="clicker" onclick="swipe(1)"></div>
+                </div>
+                <picture id="swipePage1" class="swipePage">
+                    <source class="raspberry" media="(min-width: 1920px)" srcset="images/raspberry1920px.jpg">
+                    <source class="raspberry" media="(min-width: 1536px)" srcset="images/raspberry1536px.jpg">
+                    <source class="raspberry" media="(min-width: 1366px)" srcset="images/raspberry1366px.jpg">
+                    <source class="raspberry" media="(min-width: 820px)" srcset="images/raspberry820px.jpg">
+                    <source class="raspberry" media="(min-width: 414px)" srcset="images/raspberry414px.jpg">
+                    <source class="raspberry" media="(min-width: 375px)" srcset="images/raspberry375px.jpg">
+                    <source class="raspberry" media="(min-width: 360px)" srcset="images/raspberry360px.jpg">
+                    <source class="raspberry" media="(max-width: 360px)" srcset="images/raspberry360px.jpg">
+                    <img class="swipePage__img raspberry" src="images/raspberry1536px.jpg" alt="A picture of a raspberry.">
+                </picture>
+                <div class="page1__box">
+                    <!-- 7.2 Hero image text -->
+                    <h1 class="box__header">Discover the world of exotic fruits!</h1>
+                    <!--<h2>Grows on trees!</h2>-->
+                </div>
+                <picture id="swipePage2" class="swipePage">
+                    <source class="strawberries" media="(min-width: 1920px)" srcset="images/strawberries1920px.jpg">
+                    <source class="strawberries" media="(min-width: 1536px)" srcset="images/strawberries1536px.jpg">
+                    <source class="strawberries" media="(min-width: 1366px)" srcset="images/strawberries1366px.jpg">
+                    <source class="strawberries" media="(min-width: 820px)" srcset="images/strawberries820px.jpg">
+                    <source class="strawberries" media="(min-width: 414px)" srcset="images/strawberries414px.jpg">
+                    <source class="strawberries" media="(min-width: 375px)" srcset="images/strawberries375px.jpg">
+                    <source class="strawberries" media="(min-width: 360px)" srcset="images/strawberries360px.jpg">
+                    <source class="strawberries" media="(max-width: 360px)" srcset="images/strawberries360px.jpg">
+                    <img class="swipePage__img strawberries" src="images/strawberries1536px.jpg" alt="A picture of some strawberries.">
+                </picture>
+            </div>
+        </div>
+        <!-- 7.3 Section 2 -->
+        <div id="section2Container">
+            <!-- Part 1 (doubletap) -->
+            <div id="s2c__smallCard1" class="s2c__smallCard"></div>
+            <p id="appleCount"></p>
+            <div id="s2c__box1" class="s2c__box">
+                <img class="s2c__img img--darkmode" src="images/BlackTree.svg" alt="A tree in black and white.">
+                <img class="s2c__img" src="images/WhiteTree.svg" alt="A tree in white and black.">
+                <img id="apple" class="s2c__img" src="images/BlackApple.svg" alt="An apple in black and white.">
+            </div>
+            <div id="s2c__nrbox1" class="s2c__nrbox">
+                <h2 class="nrBox__nr">1</h2>
+                <svg class="box__svg" viewbox="0 0 100 100">
+                    <circle class="s2c__circle" cx="0" cy="0" r="25"></circle>
+                </svg>
+            </div>
+            <h2 id="s2c__find" class="s2c__section">Find fruits.</h2>
+            <!-- Part 2 (gyro) -->
+            <div id="s2c__smallCard2" class="s2c__smallCard"></div>
+            <div id="keyframe__drivingTruck" class="s2c__box">
+                <img class="keyframe__throwBox s2c__img img--darkmode" src="images/BlackBox.svg" alt="A box in black and white.">
+                <img class="keyframe__throwBox s2c__img" src="images/WhiteBox.svg" alt="A box in white and black.">
+                <img class="truck s2c__img img--darkmode" src="images/BlackTruck.svg" alt="A truck in black and white.">
+                <img class="truck s2c__img" src="images/WhiteTruck.svg" alt="A truck in white and black.">
+            </div>
+            <div id="s2c__nrbox2" class="s2c__nrbox">
+                <h2 class="nrBox__nr">2</h2>
+                <svg class="box__svg" viewbox="0 0 100 100">
+                    <circle class="s2c__circle" cx="0" cy="0" r="25"></circle>
+                </svg>
+            </div>
+            <h2 id="s2c__order" class="s2c__section">Order fruits.</h2>
+            <!-- Part 3 -->
+            <div id="s2c__smallCard3" class="s2c__smallCard"></div>
+            <div id="s2c__box3" class="s2c__box">
+            <img id="smileyImg" class="s2c__img" src="images/smiley.svg" alt="A smiley.">
+            <svg id="smiley" viewbox="0 0 100 100">
+                <circle id="smileyFace" class="redSmiley transparentSmiley" cx="0" cy="0" r="35"></circle>
+            </svg>
+            </div>
+            <div id="s2c__nrbox3" class="s2c__nrbox">
+                <h2 class="nrBox__nr">3</h2>
+                <svg class="box__svg" viewbox="0 0 100 100">
+                    <circle class="s2c__circle" cx="0" cy="0" r="25"></circle>
+                </svg>
+            </div>
+            <h2 id="s2c__enjoy" class="s2c__section">Enjoy fruits.</h2>
+        </div>
+        <!-- 7.4 Section 3 -->
+        <div id="section3Container">
+            <div id="s2c__background"></div>
+            <div id="s2c__smallCard4" class="s2c__smallCard">
+                <h2 class="s2c__section">With BERRY!</h2>
+            </div>
+        </div>
+        <!-- 5. Footer -->
+        <footer class="footerContainer">
+            <ul class="list1">
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(6); BMflipE();">Questions and answers</button></li>
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(6); BMflipE();">Work at Berry</button></li>
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(6); BMflipE();">Contact us</button></li>
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(5); BMflipE();">Credits</button></li>
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(6); BMflipE();">Cookies</button></li>
+            </ul>
+            <ul class="list2">
+                <li class="socialGrid">
+                    <button class="btn footer__btn socialButton fb" type="button" onclick="showPage(6); BMflipE();"><img src="images/fb1.svg" alt="Facebook icon."></button>
+                    <button class="btn footer__btn socialButton ig" type="button" onclick="showPage(6); BMflipE();"><img src="images/ig1.svg" alt="Instagram icon."></button>
+                </li>
+            </ul>
+            <div class="footerMargin"><p></p></div>
+        </footer>
+    </div>
+    <!-- 8. Page 2 -->
+    <div id="page2" class="page">
+        <!-- 8.1 Menu -->
+        <div class="menu">
+            <button id="menu__btn1" class="btn menu__btn" type="button" onclick="showPage(6); BMflipE();">
+                <span class="btn__text">Search fruit</span>
+                <span class="arrow">></span>
+            </button>
+            <button id="menu__btn2" class="btn menu__btn" type="button" onclick="showPage(6); BMflipE();">
+                <span class="btn__text">Store</span>
+                <span class="arrow">></span>
+            </button>
+            <button id="menu__btn3" class="btn menu__btn" type="button" onclick="showPage(6); BMflipE();">
+                <span class="btn__text">Recepy</span>
+                <span class="arrow">></span>
+            </button>
+            <button id="menu__btn4" class="btn menu__btn" type="button" onclick="showPage(6); BMflipE();">
+                <span class="btn__text">Environment</span>
+                <span class="arrow">></span>
+            </button>
+        </div>
+    </div>
+    <div id="page3" class="page">
+    </div>
+    <div id="page4" class="page">
+    </div>
+    <!-- 9. Page 5 -->
+    <div id="page5" class="page">
+        <table>
+            <tbody id="page5__table">
+                <tr>
+                    <td id="page5__table__td1">
+                        <ul>
+                            <li>
+                                <a href="https://unsplash.com/photos/3HnVKfQZGTQ" target="_blank">Red raspberry</a> by
+                                <a href="https://unsplash.com/@bkaraivanov" target="_blank">Bozhin Karaivanov</a> used under
+                                <a href="https://unsplash.com/license" target="_blank">the Unsplash license</a> / Resized from original.
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="page5__table__td2">
+                        <ul>
+                            <li>
+                                <a href="https://unsplash.com/photos/rfK7qmyPOEg" target="_blank">Strength of Life</a> by
+                                <a href="https://unsplash.com/@hngstrm" target="_blank">Henry & Co.</a> used under
+                                <a href="https://unsplash.com/license" target="_blank">the Unsplash license</a> / Resized from original.
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="page5__table__td3">
+                        <ul>
+                            <li>
+                                <a href="https://www.iconfinder.com/icons/5282541/fb_social_media_facebook_facebook_logo_social_network_icon" target="_blank">Fb, social media, facebook, facebook logo, social network icon</a> by
+                                <a href="https://www.iconfinder.com/iconfinder" target="_blank">Iconfinder</a> used under
+                                <a href="https://support.iconfinder.com/en/articles/18231-license-basic" target="_blank">License - Basic</a> / Changed color from original.
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="page5__table__td4">
+                        <ul>
+                            <li>
+                                <a href="https://www.iconfinder.com/icons/1161953/instagram_icon" target="_blank">Instagram icon</a> by
+                                <a href="https://www.iconfinder.com/Picons" target="_blank">Picons.me</a> used under
+                                <a href="https://support.iconfinder.com/en/articles/18231-license-basic" target="_blank">License - Basic</a> / Changed color from original.
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- 10. Page 6 -->
+    <div id="page6" class="page">
+        <div id="page6__grid">
+            <div id="page6__item">
+                <h1>Coming soon</h1>
+                <p>UNDER CONSTRUCTION</p>
+            </div>
+        </div>
+        <!-- 5. Footer -->
+        <footer class="footerContainer">
+            <ul class="list1">
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(6); BMflipE();">Questions and answers</button></li>
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(6); BMflipE();">Work at Berry</button></li>
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(6); BMflipE();">Contact us</button></li>
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(5); BMflipE();">Credits</button></li>
+                <li><button class="btn footer__btn footerListItem" type="button" onclick="showPage(6); BMflipE();">Cookies</button></li>
+            </ul>
+            <ul class="list2">
+                <li class="socialGrid">
+                    <button class="btn footer__btn socialButton fb" type="button" onclick="showPage(6); BMflipE();"><img src="images/fb1.svg" alt="Facebook icon."></button>
+                    <button class="btn footer__btn socialButton ig" type="button" onclick="showPage(6); BMflipE();"><img src="images/ig1.svg" alt="Instagram icon."></button>
+                </li>
+            </ul>
+            <div class="footerMargin"><p></p></div>
+        </footer>
+    </div>
+    <!-- 1.1 Javascript -->
+    <script>
+        /*---------------------------------
+            1.1.1 SPA
+            Single Page Application logic
+        ---------------------------------*/
+        // Help function that shows page p and hides all other pages.
+        function showPage(p) {
+            // Step 1 - Hide all pages.
+            pageArr = document.getElementsByClassName("page");
+            for (let i = 0; i < pageArr.length; i++) {
+                let page = pageArr[i];
+                page.style.display = "none";
+            }
+            // Step 2 - Show the selected page.
+            document.getElementById("page" + p).style.display = "block";
+            /*// Step 3 - Make buttons inactive.
+            btnArr = document.getElementsByClassName("btn");
+            for (let i = 0; i < btnArr.length; i++) {
+                let btn = btnArr[i];
+                btn.classList.remove("active");
+            }
+            // Step 4 - Make page button active.
+            let navBtn = document.getElementById("nav" + p);
+            if (navBtn) {
+                navBtn.classList.add("active");
+            }*/
+        }    
+        // Init function. Here we can put code that is needed to initialize our prototype.
+        function initPrototype() {
+            // For example, when using sound or sensors this becomes important.
+            console.log("==> Prototype init started.");
+        }
+
+        /*------------------------------------
+            1.1.2 Burger icon shift styling
+        ------------------------------------*/
+        function BMflipX() {
+            var BU = document.getElementById("burger__upper");
+            var BM = document.getElementById("burger__middle")
+            var BL = document.getElementById("burger__lower");
+            /* ----- Cross-burger-icon -----
+            var BX1 = document.getElementById("burger__X1");
+            var BX2 = document.getElementById("burger__X2");*/
+            var BUF = document.getElementById("burger__upper--faded");
+            var BMF = document.getElementById("burger__middle--faded");
+            var BLF = document.getElementById("burger__lower--faded");
+            if(BM.classList.contains("burger--visible")){
+                BU.classList.toggle("burger--visible");
+                BU.classList.toggle("burger--invisible");
+                BM.classList.toggle("burger--visible");
+                BM.classList.toggle("burger--invisible");
+                BL.classList.toggle("burger--visible");
+                BL.classList.toggle("burger--invisible");
+                BUF.classList.toggle("burger--invisible");
+                BUF.classList.toggle("burger--faded--visible");
+                BMF.classList.toggle("burger--invisible");
+                BMF.classList.toggle("burger--faded--visible");
+                BLF.classList.toggle("burger--invisible");
+                BLF.classList.toggle("burger--faded--visible");
+                /* ----- Cross-burger-icon -----
+                BX1.classList.toggle("burger--invisible");
+                BX1.classList.toggle("burger--visible");
+                BX2.classList.toggle("burger--invisible");
+                BX2.classList.toggle("burger--visible");*/
+            }
+        }
+        function BMflipE() {
+            var BU = document.getElementById("burger__upper");
+            var BM = document.getElementById("burger__middle");
+            var BL = document.getElementById("burger__lower");
+            /* ----- Cross-burger-icon -----
+            var BX1 = document.getElementById("burger__X1");
+            var BX2 = document.getElementById("burger__X2");*/
+            var BUF = document.getElementById("burger__upper--faded");
+            var BMF = document.getElementById("burger__middle--faded");
+            var BLF = document.getElementById("burger__lower--faded");
+            if(BM.classList.contains("burger--invisible")){
+                BU.classList.toggle("burger--invisible");
+                BU.classList.toggle("burger--visible");
+                BM.classList.toggle("burger--invisible");
+                BM.classList.toggle("burger--visible");
+                BL.classList.toggle("burger--invisible");
+                BL.classList.toggle("burger--visible");
+                BUF.classList.toggle("burger--faded--visible");
+                BUF.classList.toggle("burger--invisible");
+                BMF.classList.toggle("burger--faded--visible");
+                BMF.classList.toggle("burger--invisible");
+                BLF.classList.toggle("burger--faded--visible");
+                BLF.classList.toggle("burger--invisible");
+                /* ----- Cross-burger-icon -----
+                BX1.classList.toggle("burger--visible");
+                BX1.classList.toggle("burger--invisible");
+                BX2.classList.toggle("burger--visible");
+                BX2.classList.toggle("burger--invisible");*/
+            }
+        }
+
+        /*------------------------------------
+            1.1.3 Hammer.js - Swipe - Carousel
+        ------------------------------------*/
+        var numberOfSwipePages;
+        var swipePage = 2;
+        function showSwipePageRight(newSwipePage) {
+            document.getElementById('swipePage' + swipePage).style.animation = "outright  1s ease-in-out 0s 1 forwards";
+            document.getElementById('swipePage' + newSwipePage).style.animation = "inleft 1s ease-in-out 0s 1 forwards";
+            swipePage = newSwipePage;
+        }
+        function showSwipePageLeft(newSwipePage) {
+            document.getElementById('swipePage' + swipePage).style.animation = "outleft 1s ease-in-out 0s 1 forwards";
+            document.getElementById('swipePage' + newSwipePage).style.animation = "inright 1s ease-in-out 0s 1 forwards";
+            swipePage = newSwipePage;
+        }
+        function swipe(direction) {
+            var newSwipePage = swipePage + direction;
+            // if we swipe beyond the first page, we go to last page instead.
+            if (newSwipePage == 0) {
+                newSwipePage = numberOfSwipePages - 1; // Modified code for a special feature. "-1" is used in order to not got to the last page instead and in order to avoid breaking the code.
+            }
+            // if we swipe beyond the last page, we go to first page instead.
+            else if (newSwipePage > numberOfSwipePages) {
+                newSwipePage = 1 + 1; // Modified code for a special feature. "+1" is used in order to not got to the first page instead and in order to avoid breaking the code.
+            }
+            if (direction == 1) {
+                showSwipePageLeft(newSwipePage);
+            }
+            else {
+                showSwipePageRight(newSwipePage);
+            }
+        }
+        /*Does not work*/
+        /*function highlight(){
+            /* Added code used in order to highlight the left clicker.
+            var leftClicker = document.getElementById("leftClicker");
+            var rightClicker = document.getElementById("rightClicker");
+            leftClicker.classlist.add("activeClicker");
+            console.log("leftClicker.classlist");
+            rightClicker.classlist.remove("activeClicker");
+
+            /* Added code used in order to highlight the right clicker.
+            var leftClicker = document.getElementById("leftClicker");
+            var rightClicker = document.getElementById("rightClicker");
+            leftClicker.classlist.remove("activeClicker");
+            rightClicker.classlist.add("activeClicker");
+        }*/
+        function initHammer() {
+            numberOfSwipePages = document.getElementsByClassName('swipePage').length;
+            var element = document.getElementById("swipeContainer");
+            var hammertime = Hammer(element);
+            hammertime.on("swiperight", function (event) { swipe(-1) });
+            hammertime.on("swipeleft", function (event) { swipe(1) });
+        }
+
+        /*---------------------------------------------
+            1.1.4 Hammer.js - Doubletap - Tree SVG
+        ---------------------------------------------*/
+        var toucharea = document.getElementById('s2c__box1'); // <-- Tree
+        var effectarea = document.getElementById('apple'); // <-- Tree
+        var data = 0;
+        var ham = new Hammer(toucharea); // <-- Hammer on tree area
+        ham.on("doubletap", function(ev){
+            if (effectarea.classList.contains('appleAnimation')){
+                effectarea.classList.remove('appleAnimation');
+            }
+            else {
+                effectarea.classList.add('appleAnimation');
+                increasing(); //
+            }
+        })
+        function increasing(){
+            data += 1;
+            document.getElementById('appleCount').innerText = data;
+        }
+
+        /*---------------------------------------
+            1.1.5 Shaker.js - State & Shake
+        ---------------------------------------*/
+        function initShaker()
+        {
+            shaker.on("state",function(edata){
+                if (edata == "LSIDE") {
+                    document.getElementById('keyframe__drivingTruck').style.animationName = "drivingNoStop";
+                }
+                else {
+                    document.getElementById('keyframe__drivingTruck').style.animationName = "drivingRight";
+                }
+            });
+        }
+        /*------------------------------------
+            1.1.6 Shaker.js - Shake
+            Testa med "shake();"
+        ------------------------------------*/
+        function shake(fdata) {
+            var element = document.getElementById("smileyFace");
+            if (element.getAttribute("class") == "transparentSmiley"){
+                element.setAttribute("class", "redSmiley");
+            }
+            else {
+                element.setAttribute("class", "transparentSmiley");
+            }
+        }
+    </script>
+</body>
+</html>
